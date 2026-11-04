@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4f1e8" />
+  <title>今天赚到哪了？</title>
+  <style>
+    :root {
+      --ink: #17231b;
+      --muted: #68736b;
+      --cream: #f4f1e8;
+      --paper: rgba(255,255,255,.72);
+      --green: #245d3a;
+      --lime: #c8f36b;
+      --line: rgba(23,35,27,.12);
+      --shadow: 0 30px 80px rgba(39,50,36,.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 8% 5%, rgba(200,243,107,.65), transparent 31rem),
+        radial-gradient(circle at 92% 100%, rgba(36,93,58,.17), transparent 35rem),
+        var(--cream);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .28;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+    }
+    button, input { font: inherit; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; position: relative; }
+    nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 54px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.03em; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--lime); display: grid; place-items: center; font-size: 18px; }
+    .today { color: var(--muted); font-size: 14px; }
+    .hero { display: grid; grid-template-columns: 1.35fr .65fr; gap: 32px; align-items: stretch; }
+    .main-card, .settings-card { border: 1px solid rgba(255,255,255,.72); background: var(--paper); backdrop-filter: blur(22px); box-shadow: var(--shadow); }
+    .main-card { border-radius: 38px; padding: clamp(26px, 5vw, 56px); position: relative; overflow: hidden; min-height: 590px; }
+    .main-card::after { content:"¥"; position:absolute; right:-18px; top:-100px; font-size: 360px; font-weight:900; color: rgba(36,93,58,.045); transform: rotate(9deg); pointer-events:none; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--green); font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #59b06f; box-shadow: 0 0 0 7px rgba(89,176,111,.12); animation: pulse 1.8s infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 11px rgba(89,176,111,0); } }
+    h1 { margin: 22px 0 4px; font-size: clamp(34px, 5vw, 64px); line-height: 1.02; letter-spacing: -.065em; max-width: 680px; }
+    .money { margin-top: 38px; display: flex; align-items: flex-start; letter-spacing: -.07em; position: relative; z-index: 1; }
+    .currency { font-size: clamp(28px, 4vw, 48px); line-height: 1.4; font-weight: 800; margin-right: 9px; color: var(--green); }
+    #earned { font-size: clamp(72px, 11vw, 138px); line-height: .95; font-weight: 850; font-variant-numeric: tabular-nums; }
+    .subline { margin: 18px 0 36px; color: var(--muted); font-size: 15px; }
+    .subline strong { color: var(--ink); }
+    .progress-track { height: 18px; border-radius: 999px; background: rgba(23,35,27,.09); padding: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--green), #54a965 72%, var(--lime)); transition: width .8s cubic-bezier(.2,.8,.2,1); position: relative; }
+    .progress-fill::after { content:""; position:absolute; inset:0; background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,.55), transparent 70%); animation: shine 3s infinite; }
+    @keyframes shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    .progress-meta { display:flex; justify-content:space-between; margin-top:13px; font-size:14px; font-weight:700; }
+    .milestones { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:42px; }
+    .metric { border-top:1px solid var(--line); padding-top:18px; }
+    .metric span { display:block; color:var(--muted); font-size:12px; margin-bottom:7px; }
+    .metric strong { font-size:20px; letter-spacing:-.03em; font-variant-numeric:tabular-nums; }
+    .settings-card { border-radius: 30px; padding: 30px; display:flex; flex-direction:column; }
+    .settings-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .settings-head h2 { margin:0; font-size:22px; letter-spacing:-.04em; }
+    .edit-badge { border:1px solid var(--line); border-radius:999px; padding:7px 10px; color:var(--muted); font-size:11px; }
+    .field { margin-top:24px; }
+    label { display:block; margin-bottom:9px; color:var(--muted); font-size:12px; font-weight:700; }
+    .input-wrap { position:relative; }
+    input { width:100%; border:1px solid var(--line); background:rgba(255,255,255,.68); border-radius:15px; padding:14px 16px; color:var(--ink); outline:none; transition:.2s; }
+    input:focus { border-color:var(--green); box-shadow:0 0 0 4px rgba(36,93,58,.09); background:white; }
+    #salary { padding-left:38px; font-size:21px; font-weight:800; }
+    .prefix { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-weight:800; color:var(--green); }
+    .time-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .lunch-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .save { margin-top:25px; border:0; border-radius:15px; padding:15px; background:var(--ink); color:white; font-weight:800; cursor:pointer; box-shadow:0 10px 24px rgba(23,35,27,.2); transition:.2s; }
+    .save:hover { transform:translateY(-2px); background:var(--green); }
+    .save:active { transform:translateY(0); }
+    .quote { margin-top:auto; padding-top:27px; border-top:1px solid var(--line); color:var(--muted); line-height:1.7; font-size:13px; }
+    .quote strong { color:var(--green); }
+    .offwork { display:none; margin-top:32px; padding:18px 20px; background:var(--lime); border-radius:18px; font-weight:800; }
+    .toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); opacity:0; color:white; background:var(--ink); padding:12px 18px; border-radius:99px; font-size:13px; transition:.3s; z-index:5; }
+    .toast.show { opacity:1; transform:translate(-50%, 0); }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns:1fr; }
+      nav { margin-bottom:28px; }
+      .main-card { min-height:auto; }
+      .settings-card { min-height:520px; }
+    }
+    @media (max-width: 520px) {
+      .shell { width:min(100% - 20px, 1120px); padding-top:18px; }
+      .main-card, .settings-card { border-radius:25px; padding:24px 20px; }
+      .milestones { gap:8px; }
+      .metric strong { font-size:16px; }
+      .time-row, .lunch-row { gap:8px; }
+      .today { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav>
+      <div class="brand"><span class="brand-mark">¥</span><span>薪情不错</span></div>
+      <div class="today" id="today"></div>
+    </nav>
+
+    <section class="hero">
+      <article class="main-card">
+        <div class="eyebrow"><i class="live-dot"></i><span id="statusText">正在认真赚钱</span></div>
+        <h1 id="headline">每一秒，都有回响。</h1>
+        <div class="money"><span class="currency">¥</span><span id="earned">0.00</span></div>
+        <p class="subline">今天目标 <strong id="goal">¥ 500.00</strong>，你已经拿下 <strong id="percentText">0.0%</strong></p>
+        <div class="progress-track" aria-label="今日工资进度"><div class="progress-fill" id="progress"></div></div>
+        <div class="progress-meta"><span>上班</span><span id="countdown">距离下班 --:--:--</span><span>下班</span></div>
+        <div class="milestones">
+          <div class="metric"><span>每小时</span><strong id="hourly">¥ 0.00</strong></div>
+          <div class="metric"><span>每分钟</span><strong id="minute">¥ 0.00</strong></div>
+          <div class="metric"><span>每秒钟</span><strong id="second">¥ 0.000</strong></div>
+        </div>
+        <div class="offwork" id="offwork">🎉 今日份工资已到账，辛苦了！</div>
+      </article>
+
+      <aside class="settings-card">
+        <div class="settings-head"><div><h2>我的工作日</h2></div><span class="edit-badge">自动保存</span></div>
+        <div class="field"><label for="salary">日工资</label><div class="input-wrap"><span class="prefix">¥</span><input id="salary" type="number" min="0" step="10" inputmode="decimal" value="500" /></div></div>
+        <div class="time-row">
+          <div class="field"><label for="start">上班时间</label><input id="start" type="time" value="09:00" /></div>
+          <div class="field"><label for="end">下班时间</label><input id="end" type="time" value="18:00" /></div>
+        </div>
+        <div class="lunch-row">
+          <div class="field"><label for="lunchStart">午休开始</label><input id="lunchStart" type="time" value="12:00" /></div>
+          <div class="field"><label for="lunchEnd">午休结束</label><input id="lunchEnd" type="time" value="13:00" /></div>
+        </div>
+        <button class="save" id="save">更新我的进度</button>
+        <div class="quote"><strong>小提示</strong><br><span id="quoteText">别数还有多久下班，看看已经赚了多少。</span></div>
+      </aside>
+    </section>
+  </main>
+  <div class="toast" id="toast">已更新，继续赚钱！</div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const fields = ['salary','start','end','lunchStart','lunchEnd'];
+    const quotes = ['别数还有多久下班，看看已经赚了多少。','今天的努力，正在实时变现。','工位坐得稳，余额涨得狠。','把时间交给进度条，把焦虑交给下班。'];
+    const saved = JSON.parse(localStorage.getItem('wage-progress-v1') || '{}');
+    fields.forEach(k => { if (saved[k] !== undefined) $(k).value = saved[k]; });
+
+    function minutes(value) {
+      const [h, m] = value.split(':').map(Number);
+      return h * 60 + m;
+    }
+    function workConfig() {
+      const start = minutes($('start').value), end = minutes($('end').value);
+      let lunchStart = minutes($('lunchStart').value), lunchEnd = minutes($('lunchEnd').value);
+      lunchStart = Math.max(start, Math.min(end, lunchStart));
+      lunchEnd = Math.max(lunchStart, Math.min(end, lunchEnd));
+      return { salary: Math.max(0, Number($('salary').value) || 0), start, end, lunchStart, lunchEnd };
+    }
+    function elapsedWork(nowMin, c) {
+      if (nowMin <= c.start) return 0;
+      const beforeLunch = Math.max(0, Math.min(nowMin, c.lunchStart) - c.start);
+      const afterLunch = Math.max(0, Math.min(nowMin, c.end) - c.lunchEnd);
+      return beforeLunch + afterLunch;
+    }
+    function formatDuration(totalSeconds) {
+      const s = Math.max(0, Math.floor(totalSeconds));
+      const h = String(Math.floor(s / 3600)).padStart(2,'0');
+      const m = String(Math.floor((s % 3600) / 60)).padStart(2,'0');
+      return `${h}:${m}:${String(s % 60).padStart(2,'0')}`;
+    }
+    function tick() {
+      const now = new Date();
+      const c = workConfig();
+      const totalMinutes = Math.max(1, (c.end - c.start) - (c.lunchEnd - c.lunchStart));
+      const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
+      const elapsed = Math.min(totalMinutes, elapsedWork(nowMin, c));
+      const percent = Math.max(0, Math.min(100, elapsed / totalMinutes * 100));
+      const earned = c.salary * percent / 100;
+      const hourly = c.salary / (totalMinutes / 60);
+      $('earned').textContent = earned.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
+      $('goal').textContent = `¥ ${c.salary.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+      $('percentText').textContent = `${percent.toFixed(1)}%`;
+      $('progress').style.width = `${percent}%`;
+      $('hourly').textContent = `¥ ${hourly.toFixed(2)}`;
+      $('minute').textContent = `¥ ${(hourly / 60).toFixed(2)}`;
+      $('second').textContent = `¥ ${(hourly / 3600).toFixed(3)}`;
+
+      const isBefore = nowMin < c.start, isAfter = nowMin >= c.end;
+      const isLunch = nowMin >= c.lunchStart && nowMin < c.lunchEnd;
+      let secondsLeft = (c.end - nowMin) * 60;
+      $('countdown').textContent = isBefore ? `距离上班 ${formatDuration((c.start-nowMin)*60)}` : isAfter ? '今天已完成' : `距离下班 ${formatDuration(secondsLeft)}`;
+      $('statusText').textContent = isBefore ? '蓄力等待开工' : isAfter ? '今日打卡完成' : isLunch ? '午休中 · 工资暂停' : '正在认真赚钱';
+      $('headline').textContent = isBefore ? '准备好，今天也会很值钱。' : isAfter ? '下班！今天也辛苦了。' : isLunch ? '吃饱一点，下午继续赚。' : '每一秒，都有回响。';
+      $('offwork').style.display = isAfter ? 'block' : 'none';
+    }
+    function save() {
+      const c = workConfig();
+      if (c.end <= c.start) { $('toast').textContent = '下班时间要晚于上班时间哦'; }
+      else {
+        const data = Object.fromEntries(fields.map(k => [k, $(k).value]));
+        localStorage.setItem('wage-progress-v1', JSON.stringify(data));
+        $('toast').textContent = '已更新，继续赚钱！';
+        $('quoteText').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+      }
+      $('toast').classList.add('show');
+      setTimeout(() => $('toast').classList.remove('show'), 1800);
+      tick();
+    }
+    $('save').addEventListener('click', save);
+    fields.forEach(k => $(k).addEventListener('change', save));
+    $('today').textContent = new Intl.DateTimeFormat('zh-CN', {month:'long', day:'numeric', weekday:'long'}).format(new Date());
+    tick(); setInterval(tick, 100);
+  </script>
+</body>
+</html>
